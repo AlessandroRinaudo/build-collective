@@ -170,4 +170,14 @@ contract BuildCollective is Ownable {
     return projects[projectName];
   }
 
+  function addProjectContributors(string memory projectName, address newContributor) public returns (Projects memory){
+    require(users[msg.sender].registered); // If user aldready registred
+    require(users[newContributor].registered); // If user aldready registred
+    require(projects[projectName].registered); // If project aldready registred
+
+    contributors[newContributor] = contributors[newContributor].push(projectName);
+    return contributors[newContributor];
+  }
+
+
 }
