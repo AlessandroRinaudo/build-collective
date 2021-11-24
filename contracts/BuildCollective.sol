@@ -97,6 +97,8 @@ contract BuildCollective is Ownable {
       companies[companyName].owner = users[msg.sender];
       companies[companyName].balance = 0;
       companies[companyName].registered = true;
+
+      members[msg.sender] = companies[companyName];
     }
     emit CompanyCreated(companyName, users[msg.sender], companies[companyName]);
 
@@ -112,6 +114,70 @@ contract BuildCollective is Ownable {
     members[newMember] = companies[companyName];
   }
 
+  // =============
+  // || PROJECT ||
+  // =============
+
+  struct Project {
+    string name;
+    uint256 balance;
+    User user_owner;
+    Company company_owner;
+    bool registered;
+  }
+
+  mapping(string => Project) private projects;
+  mapping(address => string[]) private contributors;
+
+  function compareProject(Project memory a, Project memory b) public returns (bool) {
+    return compareString(a.name, b.name)
+    && compareUsers(a.user_owner, b.user_owner)
+    && compareCompanies(a.company_owner, b.company_owner)
+    && a.balance == b.balance
+    && a.registered == b.registered;
+  }
+
+  event ProjectCreated(string indexed projectName, Project indexed pro);
+  event ProjectFailedCreated(string indexed projectName, string explanation);
+
+  function project(string memory projectName) public view returns (Project memory) {
+    return projects[projectName];
+  }
+
+  function contributorOf(address userAddress) public view returns (Project memory) {
+    return contributors[userAddress];
+  }
+
+  // If perso is true then the msg send is the owner, if it's false it will be his company
+  function createProject(string memory projectName, bool perso) public returns (Project memory) {
+    require(bytes(projectName).length > 0);
+    require(users[msg.sender].registered); // If user aldready registred
+
+    if(projects[projectName].registered == false){
+      projects[projectName].name = projectName;
+      if (perso){
+        projects[projectName].user_owner = users[msg.sender];
+      }
+      else{
+        require(members[msg.sender].registered); // If user is in company
+        projects[projectName].company_owner = members[msg.sender];
+      }
+      projects[projectName].balance = 0;
+      projects[projectName].registered = true;
+    }
+    emit ProjectCreated(projectName, projects[projectName]);
+
+    return projects[projectName];
+  }
+
+  function addProjectContributors(string memory projectName, address newContributor) public returns (Project memory){
+    require(users[msg.sender].registered); // If user aldready registred
+    require(users[newContributor].registered); // If user aldready registred
+    require(projects[projectName].registered); // If project aldready registred
+
+    contributors[newContributor] = contributors[newContributor].push(projectName);
+    return contributors[newContributor];
+  }
 
 
 }
