@@ -47,14 +47,13 @@ import { useStore } from 'vuex'
 import Card from '@/components/Card.vue'
 
 export default defineComponent({
-  name: 'Account',
   components: { Card },
   setup() {
     const store = useStore()
     const contract = computed(() => store.state.contract) // take the contract  !REQUIRED TO CONNECTION
     const address = computed(() => store.state.account.address) // take the address !REQUIRED TO CONNECTION
     const nbETH = computed(() => store.state.account.nbETH) // take the account balance ex: 100 eth  account.balance != balance
-    return { address, contract, nbETH }
+    return { address, contract, nbETH}
   },
     data() {
     const account = null

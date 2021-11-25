@@ -3,21 +3,21 @@
     <card
       v-if="!address"
       title="It looks like you're not connected."
-      subtitle="Please connect to use the app."
+      subtitle="Please connect to use your company app."
       :blue="true"
     >
       <collective-button :transparent="true" @click="connect">
-        Connect
+        Connect to my company
       </collective-button>
     </card>
     <card v-if=!address> 
-        <collective-button :transparent="true" @click="goToCompanyLogin">
-        or go to company login
+        <collective-button :transparent="true" @click="goToLogin">
+        back to login account
       </collective-button>
     </card>
     <card title="You're connected!" :blue="true" v-else>
-      <collective-button :transparent="true" @click="goToAccount">
-        Go to account
+      <collective-button :transparent="true" @click="goToCompany">
+        Go to your company account
       </collective-button>
     </card>
     <spacer :size="24" />
@@ -40,11 +40,11 @@ export default defineComponent({
     return { address, connect }
   },
   methods: {
-    goToAccount() {
-      this.$router.push({ name: 'Account' }) // Avec cette commande on peut changer de page en utilisant le nom de la page  
+    goToCompany() {
+      this.$router.push({ name: 'Company' }) // Avec cette commande on peut changer de page en utilisant le nom de la page  
     },
-    goToCompanyLogin() {
-      this.$router.push({ name: 'CompanySignIn' }) // Avec cette commande on peut changer de page en utilisant le nom de la page  
+    goToLogin() {
+      this.$router.push({ name: 'SignIn' }) // Avec cette commande on peut changer de page en utilisant le nom de la page  
     },
   },
 })
