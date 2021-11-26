@@ -144,7 +144,7 @@ contract BuildCollective is Ownable {
     return projects[projectName];
   }
 
-  function contributorOf(address userAddress) public view returns (Project memory) {
+  function contributorOf(address userAddress) public view returns (string[] memory) {
     return contributors[userAddress];
   }
 
@@ -170,13 +170,36 @@ contract BuildCollective is Ownable {
     return projects[projectName];
   }
 
-  function addProjectContributors(string memory projectName, address newContributor) public returns (Project memory){
+  function addProjectContributors(string memory projectName, address newContributor) public{
     require(users[msg.sender].registered); // If user aldready registred
     require(users[newContributor].registered); // If user aldready registred
     require(projects[projectName].registered); // If project aldready registred
 
-    contributors[newContributor] = contributors[newContributor].push(projectName);
-    return contributors[newContributor];
+    string[] storage projectContributionList = contributors[newContributor]; // Extract list
+    projectContributionList.push(projectName); //
+    contributors[newContributor] = projectContributionList;
+    // return contributors[newContributor];
+  }
+
+  function addBalanceToProject(string memory projectName, uint256 amount, bool perso) public {
+    require(users[msg.sender].registered); // If user aldready registred
+    require(projects[projectName].registered); // If project aldready registred
+
+    if (perso){
+      require(users[msg.sender].balance >= amount);
+      users[msg.sender].balance = users[msg.sender].balance - amount;
+    }
+    else{
+      require(members[msg.sender].balance >= amount);
+      members[msg.sender].balance = members[msg.sender].balance - amount;
+    }
+    
+    Project memory currentProject = projects[projectName];
+    projects[projectName].name = currentProject.name;
+    projects[projectName].balance = currentProject.balance + amount;
+    projects[projectName].user_owner = currentProject.user_owner;
+    projects[projectName].company_owner = currentProject.company_owner;
+    projects[projectName].registered = currentProject.registered;
   }
 
 
