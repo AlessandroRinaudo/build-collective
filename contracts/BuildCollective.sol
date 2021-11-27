@@ -33,6 +33,7 @@ contract BuildCollective is Ownable {
 
   event UserSignedUp(address indexed userAddress, User indexed user);
 
+  //function User qui renvoie les données d'un user
   function user(address userAddress) public view returns (User memory) {
     return users[userAddress];
   }
@@ -63,7 +64,7 @@ contract BuildCollective is Ownable {
   struct Company {
     string name;
     User owner;
-    // User[] members;
+    User[] members;
     uint256 balance;
     bool registered;
   }
