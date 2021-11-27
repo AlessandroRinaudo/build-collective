@@ -57,6 +57,19 @@ contract BuildCollective is Ownable {
     return true;
   }
 
+  // Withdraw from an user account
+  function withdraw(uint256 amount) public returns (bool) {
+      require(users[msg.sender].registered);
+      require(users[msg.sender].balance >= amount);
+
+      users[msg.sender].balance -= amount;
+
+      address payable sender = address(uint160(msg.sender));
+      sender.transfer(amount);
+
+      return true;
+  }
+
   // =============
   // || COMPANY ||
   // =============
@@ -115,6 +128,14 @@ contract BuildCollective is Ownable {
     members[newMember] = companies[companyName];
   }
 
+  function addCompanyBalance(uint256 amount) public returns (bool) {
+    require(users[msg.sender].registered); // User registred
+    require(members[msg.sender].registered); // His company too
+    users[msg.sender].balance -= amount;
+    members[msg.sender].balance += amount;
+    return true;
+  }
+
   // =============
   // || PROJECT ||
   // =============
@@ -138,6 +159,17 @@ contract BuildCollective is Ownable {
     && a.registered == b.registered;
   }
 
+  function checkIfContributeToProject(address contributor, string memory projectName) public returns (bool) {
+    uint i = 0;
+    string[] memory projectsList = contributors[contributor];
+    for(i = 0; i < projectsList.length; i++){
+      if (compareString(projectName, projectsList[i])){
+        return true;
+      }
+    }
+    return false;
+  }
+
   event ProjectCreated(string indexed projectName, Project indexed pro);
   event ProjectFailedCreated(string indexed projectName, string explanation);
 
@@ -145,7 +177,7 @@ contract BuildCollective is Ownable {
     return projects[projectName];
   }
 
-  function contributorOf(address userAddress) public view returns (Project memory) {
+  function contributorOf(address userAddress) public view returns (string[] memory) {
     return contributors[userAddress];
   }
 
@@ -171,13 +203,56 @@ contract BuildCollective is Ownable {
     return projects[projectName];
   }
 
-  function addProjectContributors(string memory projectName, address newContributor) public returns (Project memory){
+  function addProjectContributors(string memory projectName, address newContributor) public {
     require(users[msg.sender].registered); // If user aldready registred
     require(users[newContributor].registered); // If user aldready registred
     require(projects[projectName].registered); // If project aldready registred
 
-    contributors[newContributor] = contributors[newContributor].push(projectName);
-    return contributors[newContributor];
+    string[] storage projectContributionList = contributors[newContributor]; // Extract list
+    projectContributionList.push(projectName); //
+    contributors[newContributor] = projectContributionList;
+    // return contributors[newContributor];
+  }
+
+  function addBalanceToProject(string memory projectName, uint256 amount, bool perso) public returns (bool) {
+    require(users[msg.sender].registered); // If user aldready registred
+    require(projects[projectName].registered); // If project aldready registred
+
+    if (perso){
+      require(users[msg.sender].balance >= amount);
+      users[msg.sender].balance = users[msg.sender].balance - amount;
+    }
+    else{
+      require(members[msg.sender].balance >= amount);
+      members[msg.sender].balance = members[msg.sender].balance - amount;
+    }
+
+    Project memory currentProject = projects[projectName];
+    projects[projectName].balance = currentProject.balance + amount;
+
+    return true;
+  }
+
+  function payContributor(string memory projectName, address contributor, uint256 amount){
+    require(users[msg.sender].registered); // If user aldready registred
+    require(users[contributor].registered); // If contributor aldready registred
+    require(checkIfContributeToProject(contributor, projectName)); // If contributor aldready registred
+    require(projects[projectName].registered); // If project aldready registred
+    require(projects[projectName].balance >= amount); // If project had a balance with enough token
+
+    // check if user or his company own the project
+    if (bytes(projects[projectName].user_owner.name).length > 0){
+      require(bytes(users[msg.sender].name) == bytes(projects[projectName].user_owner.name));
+    }
+    else if (bytes(projects[projectName].company_owner.name).length > 0){
+      require(bytes(members[msg.sender].name) == bytes(projects[projectName].company_owner.name));
+    }
+    else{
+      revert("User or his company doesnt own the project");
+    }
+
+    projects[projectName].balance -= amount;
+    projects[projectName].balance -= amount;
   }
 
 
