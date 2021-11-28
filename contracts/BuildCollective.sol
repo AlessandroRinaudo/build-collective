@@ -233,7 +233,7 @@ contract BuildCollective is Ownable {
     return true;
   }
 
-  function payContributor(string memory projectName, address contributor, uint256 amount){
+  function payContributor(string memory projectName, address contributor, uint256 amount) public {
     require(users[msg.sender].registered); // If user aldready registred
     require(users[contributor].registered); // If contributor aldready registred
     require(checkIfContributeToProject(contributor, projectName)); // If contributor aldready registred
@@ -241,11 +241,11 @@ contract BuildCollective is Ownable {
     require(projects[projectName].balance >= amount); // If project had a balance with enough token
 
     // check if user or his company own the project
-    if (bytes(projects[projectName].user_owner.name).length > 0){
-      require(bytes(users[msg.sender].name) == bytes(projects[projectName].user_owner.name));
+    if (bytes(projects[projectName].user_owner.username).length > 0){
+      require(compareString(users[msg.sender].username, projects[projectName].user_owner.username));
     }
     else if (bytes(projects[projectName].company_owner.name).length > 0){
-      require(bytes(members[msg.sender].name) == bytes(projects[projectName].company_owner.name));
+      require(compareString(members[msg.sender].name, projects[projectName].company_owner.name));
     }
     else{
       revert("User or his company doesnt own the project");
