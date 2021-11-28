@@ -18,7 +18,7 @@
   <div class="home" v-if="account">
 
     <div class="home" v-if="!company">
-    <form @submit.prevent="createCompany">
+    <form @submit.prevent="createcompany">
       <card
         title="Enter your company name here"
         subtitle="Type directly in the input and hit enter. All spaces will be converted to _"
@@ -40,21 +40,21 @@
         :gradient="false"
       >
        <div class="explanations">
-          Company name : {{ company.name}} <br>
-          Company owner : {{ company.owner.username}} <br>
+          company name : {{ company.name}} <br>
+          company owner : {{ company.owner.username}} <br>
           balance : {{company.balance}} <br>
           registered : {{company.registered}} <br> <br>
           Members : {{ company.members}} <br>
-         
+
         </div>
         <div class="explanations">
           On your company on the contract, you have
           {{ company.balance }} tokens. If you click
-          <button class="button-link" @click="addCompanyBalance()">Add tokens</button>
+          <button class="button-link" @click="addcompanyBalance()">Add tokens</button>
         </div>
       </card>
 
-      <form @submit.prevent="addCompanyMember">
+      <form @submit.prevent="addcompanyMember">
         <card
           title="Enter the new member address"
         >
@@ -68,7 +68,7 @@
       </form>
     </div>
     </div>
-    
+
 
   </div>
 </template>
@@ -107,30 +107,39 @@ export default defineComponent({
       await this.updateAccount()
       this.username = ''
     },
-    async addCompanyBalance() {
+    async addcompanyBalance() {
       const { contract } = this
       await contract.methods.addCompanyBalance(200).send()
-      await this.updateCompany()
+      await this.updatecompany()
     },
-    async updateCompany() {
-      const { companyName, contract } = this
-      this.company = await contract.methods.company(companyName).call()
+
+    async updatecompany() {
+      const { address, contract } = this
+      const companyName = await contract.methods.memberOf(address).call()
+      this.company = await contract.methods.getCompanie(companyName).call()
+      console.log('update', companyName, this.company, address)
+
     },
-    async createCompany() {
+    async createcompany() {
       const { contract, companyName } = this
       const name = companyName.trim().replace(/ /g, '_')
       await contract.methods.createCompany(name).send()
-      await this.updateCompany()
+      await this.updatecompany()
       this.companyName = ''
+      console.log('Create', companyName, this.company)
+
     },
-    async addCompanyMember() {
+    async addcompanyMember() {
       const { contract,address,memberAddress } = this
       const companyName = await contract.methods.memberOf(address).call()
-      const name = companyName.name.trim().replace(/ /g, '_')
+      // const comp = await contract.methods.company(companyName).call()
+      const name = companyName.trim().replace(/ /g, '_')
       console.log('debug', name, memberAddress)
 
       await contract.methods.addCompanyMember(name, memberAddress).send()
-      await this.updateCompany()
+      await this.updatecompany()
+      console.log('debug', this.company)
+
       this.companyName = ''
     },
   },
@@ -138,8 +147,9 @@ export default defineComponent({
     const { address, contract } = this //you need here of account and address to get "account" objet which contains username, balance( ex : 200 tokens) and a boolean
     const account = await contract.methods.user(address).call()
     const companyName = await contract.methods.memberOf(address).call()
-    const company = await contract.methods.company(companyName.name).call()
+    const company = await contract.methods.getCompanie(companyName).call()
     if (account.registered) this.account = account
+    console.log('mounted', companyName, company)
     if (company.registered && company.owner.username === account.username)
       this.company = company
   },
