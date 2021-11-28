@@ -22,13 +22,7 @@ contract BuildCollective is Ownable {
     bool registered;
   }
 
-  // function compareUsers(User memory a, User memory b) public returns (bool) {
-  //   return compareString(a.username, b.username)
-  //   && a.balance == b.balance
-  //   && a.registered == b.registered
-  //   ;
-  // }
-
+  // Do matching between user adress and users struct with their data
   mapping(address => User) private users;
 
   event UserSignedUp(address indexed userAddress, User indexed user);
@@ -38,11 +32,7 @@ contract BuildCollective is Ownable {
     return users[userAddress];
   }
 
-  // TEST ONLY
-  function createUser(address userAddress, User memory u) public returns (User memory){
-    users[userAddress] = u;
-  }
-
+  // Allow user creation
   function signUp(string memory username) public returns (User memory) {
     require(bytes(username).length > 0);
     if(users[msg.sender].registered == false){
@@ -51,6 +41,7 @@ contract BuildCollective is Ownable {
     emit UserSignedUp(msg.sender, users[msg.sender]);
   }
 
+  // Give the 'amount' of token to the user who sent the msg
   function addBalance(uint256 amount) public returns (bool) {
     require(users[msg.sender].registered);
     users[msg.sender].balance += amount;
@@ -82,26 +73,24 @@ contract BuildCollective is Ownable {
     bool registered;
   }
 
-  // function compareCompanies(Company memory a, Company memory b) public returns (bool) {
-  //   return compareString(a.name, b.name)
-  //   && compareUsers(a.owner, b.owner)
-  //   && a.balance == b.balance
-  //   && a.registered == b.registered;
-  // }
-
+  // Do matching between companies and their names
   mapping(string => Company) private companies;
+  // Do matching between user's address and their company's name
   mapping(address => string) private members;
 
   event CompanyCreated(string indexed companyName, User indexed owner, Company indexed comp);
 
+  // Return an company according to her name
   function getCompanie(string memory companyName) public view returns (Company memory) {
     return companies[companyName];
   }
 
+  // Return company's name according to an member's address
   function memberOf(address userAddress) public view returns (string memory) {
     return members[userAddress];
   }
 
+  // Create a company from it's name
   function createCompany(string memory companyName) public returns (Company memory) {
     require(bytes(companyName).length > 0);
     require(bytes(members[msg.sender]).length == 0, "Havent got aldready a company.");
@@ -120,6 +109,7 @@ contract BuildCollective is Ownable {
     return companies[companyName];
   }
 
+  // Adds a new user to the company whose name is specified
   function addCompanyMember(string memory companyName, address newMember) public returns (Company memory){
     require(users[msg.sender].registered); // If user aldready registred
     require(users[newMember].registered); // If user aldready registred
@@ -131,6 +121,7 @@ contract BuildCollective is Ownable {
     return companies[companyName];
   }
 
+  // Allow compny owner to transfer token from his balance to his company
   function addCompanyBalance(uint256 amount) public returns (bool) {
     require(users[msg.sender].registered); // User registred
     require(users[msg.sender].balance >= amount); // User balance is sufficient
@@ -154,21 +145,18 @@ contract BuildCollective is Ownable {
 
   string[] existingProject;
 
+  // Do matching between project and their names
   mapping(string => Project) private projects;
+
+  // Do matching between user and their multiple projects's names
   mapping(address => string[]) private contributors;
 
-  // function compareProject(Project memory a, Project memory b) public returns (bool) {
-  //   return compareString(a.name, b.name)
-  //   && compareUsers(a.user_owner, b.user_owner)
-  //   && compareCompanies(a.company_owner, b.company_owner)
-  //   && a.balance == b.balance
-  //   && a.registered == b.registered;
-  // }
-
+  // return all existing project
   function getProjectMapping() public view returns (string[] memory){
     return existingProject;
   }
 
+  // Check if an user contribute to the project whose name is specified
   function checkIfContributeToProject(address contributor, string memory projectName) public returns (bool) {
     uint i = 0;
     string[] memory projectsList = contributors[contributor];
@@ -183,10 +171,12 @@ contract BuildCollective is Ownable {
   event ProjectCreated(string indexed projectName, Project indexed pro);
   event ProjectFailedCreated(string indexed projectName, string explanation);
 
+  // Return project according to his name
   function project(string memory projectName) public view returns (Project memory) {
     return projects[projectName];
   }
 
+  // Return project according to an contributor address
   function contributorOf(address userAddress) public view returns (string[] memory) {
     return contributors[userAddress];
   }
@@ -215,6 +205,7 @@ contract BuildCollective is Ownable {
     return projects[projectName];
   }
 
+  // Add contributors to the project
   function addProjectContributors(string memory projectName, address newContributor) public {
     require(users[msg.sender].registered); // If user aldready registred
     require(users[newContributor].registered); // If user aldready registred
@@ -227,6 +218,7 @@ contract BuildCollective is Ownable {
     contributors[newContributor].push(projectName);
   }
 
+  // Allow project owner to transfer token from his balance to his project balance
   function addBalanceToProject(string memory projectName, uint256 amount, bool perso) public returns (bool) {
     require(users[msg.sender].registered); // If user aldready registred
     require(projects[projectName].registered); // If project aldready registred
@@ -246,6 +238,7 @@ contract BuildCollective is Ownable {
     return true;
   }
 
+  // Pay an project contributor with some token from the project balance
   function payContributor(string memory projectName, address contributor, uint256 amount) public {
     require(users[msg.sender].registered); // If user aldready registred
     require(users[contributor].registered); // If contributor aldready registred
@@ -297,7 +290,7 @@ contract BuildCollective is Ownable {
   // function getBountyRelatedTo(string memory projectName) public view returns (string[] memory) {
   //   return relatedTo[projectName];
   // }
-  //
+  // // Create an bounty from their data
   // function createBounty(string memory BountyName,string memory desc , uint256 value, string memory relatedProject) public returns (Bounty memory) {
   //   require(bytes(BountyName).length > 0);
   //   require(bytes(desc).length > 0);
@@ -325,7 +318,7 @@ contract BuildCollective is Ownable {
   //
   //   return bounties[BountyName];
   // }
-  //
+  // // Close an bounty and pay the dev who fixed the issue
   // function closeBountyAndPay(string memory bountyName, address receiver) public {
   //   require(bytes(bountyName).length > 0);
   //   // require(bytes(bounties[bountyName].owner.username) == bytes(users[msg.sender].username));
