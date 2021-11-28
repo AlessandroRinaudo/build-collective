@@ -112,11 +112,13 @@ export default defineComponent({
       await contract.methods.addCompanyBalance(200).send()
       await this.updatecompany()
     },
+
     async updatecompany() {
       const { address, contract } = this
       const companyName = await contract.methods.memberOf(address).call()
       this.company = await contract.methods.getCompanie(companyName).call()
       console.log('update', companyName, this.company, address)
+
     },
     async createcompany() {
       const { contract, companyName } = this
