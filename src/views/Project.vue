@@ -122,7 +122,7 @@ export default defineComponent({
     },
   },
   async mounted() {
-    const { address, contract } = this //you need here of account and address to get "account" objet which contains username, balance( ex : 200 tokens) and a boolean
+    const { address, contract } = this 
     const account = await contract.methods.user(address).call()
     const projectName = await contract.methods.memberOf(address).call()
     const project = await contract.methods.project(projectName).call()
