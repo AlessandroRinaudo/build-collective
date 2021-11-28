@@ -267,5 +267,75 @@ contract BuildCollective is Ownable {
     projects[projectName].balance -= amount;
   }
 
+  // ============
+  // || Bounty ||
+  // ============
+
+  struct Bounty {
+    string name;
+    string desc;
+    uint256 value;
+    User owner;
+    string relatedProject;
+    bool archived;
+    bool registered;
+  }
+
+  mapping(string => Bounty) private bounties;
+  mapping(string => string[]) private relatedTo;
+
+  event BountyCreated(string indexed bountyName, Bounty indexed bou);
+
+
+  function getBounty(string memory bountyName) public view returns (Bounty memory) {
+    return bounties[bountyName];
+  }
+
+  function getBountyRelatedTo(string memory projectName) public view returns (string[] memory) {
+    return relatedTo[projectName];
+  }
+
+  function createBounty(string memory BountyName,string memory desc , uint256 value, string memory relatedProject) public returns (Bounty memory) {
+    require(bytes(BountyName).length > 0);
+    require(bytes(desc).length > 0);
+    require(projects[relatedProject].balance >= value);
+    require(value > 0);
+    require(projects[relatedProject].registered);
+    require(users[msg.sender].registered); // If user aldready registred
+
+    if(!bounties[BountyName].registered){
+      bounties[BountyName].name = BountyName;
+      bounties[BountyName].desc = desc;
+
+      projects[relatedProject].balance -= value;
+      bounties[BountyName].value = value;
+
+      bounties[BountyName].owner = users[msg.sender];
+      bounties[BountyName].relatedProject = relatedProject;
+      relatedTo[relatedProject].push(BountyName);
+
+      bounties[BountyName].archived = false;
+      bounties[BountyName].registered = true;
+    }
+
+    emit BountyCreated(BountyName, bounties[BountyName]);
+
+    return bounties[BountyName];
+  }
+
+  function closeBountyAndPay(string memory bountyName, address receiver) public {
+    require(bytes(bountyName).length > 0);
+    // require(bytes(bounties[bountyName].owner.username) == bytes(users[msg.sender].username));
+    require(compareString(bounties[bountyName].owner.username, users[msg.sender].username));
+    require(users[msg.sender].registered); // If user aldready registred
+    require(users[receiver].registered); // If receiver aldready registred
+    require(!bounties[bountyName].archived); // If receiver aldready registred
+
+    users[receiver].balance += bounties[bountyName].value;
+    bounties[bountyName].archived = true;
+  }
+
+
+
 
 }
