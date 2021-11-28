@@ -77,7 +77,7 @@ contract BuildCollective is Ownable {
   struct Company {
     string name;
     User owner;
-    User[] members;
+    address[] members;
     uint256 balance;
     bool registered;
   }
@@ -90,20 +90,21 @@ contract BuildCollective is Ownable {
   }
 
   mapping(string => Company) private companies;
-  mapping(address => Company) private members;
+  mapping(address => string) private members;
 
   event CompanyCreated(string indexed companyName, User indexed owner, Company indexed comp);
 
-  function company(string memory companyName) public view returns (Company memory) {
+  function getCompanie(string memory companyName) public view returns (Company memory) {
     return companies[companyName];
   }
 
-  function memberOf(address userAddress) public view returns (Company memory) {
+  function memberOf(address userAddress) public view returns (string memory) {
     return members[userAddress];
   }
 
   function createCompany(string memory companyName) public returns (Company memory) {
     require(bytes(companyName).length > 0);
+    require(bytes(members[msg.sender]).length == 0, "Havent got aldready a company.");
     require(users[msg.sender].registered); // If user aldready registred
 
     if(companies[companyName].registered == false){
@@ -112,7 +113,7 @@ contract BuildCollective is Ownable {
       companies[companyName].balance = 0;
       companies[companyName].registered = true;
 
-      members[msg.sender] = companies[companyName];
+      addCompanyMember(companyName, msg.sender);
     }
     emit CompanyCreated(companyName, users[msg.sender], companies[companyName]);
 
@@ -125,14 +126,17 @@ contract BuildCollective is Ownable {
     require(companies[companyName].registered); // If company aldready registred
     require(compareString(companies[companyName].owner.username, users[msg.sender].username)); // If user is company's owner
 
-    members[newMember] = companies[companyName];
+    companies[companyName].members.push(newMember);
+    members[newMember] = companies[companyName].name;
+    return companies[companyName];
   }
 
   function addCompanyBalance(uint256 amount) public returns (bool) {
     require(users[msg.sender].registered); // User registred
-    require(members[msg.sender].registered); // His company too
+    require(users[msg.sender].balance >= amount); // User balance is sufficient
+    require(companies[members[msg.sender]].registered); // His company too
     users[msg.sender].balance -= amount;
-    members[msg.sender].balance += amount;
+    companies[members[msg.sender]].balance += amount;
     return true;
   }
 
@@ -192,8 +196,8 @@ contract BuildCollective is Ownable {
         projects[projectName].user_owner = users[msg.sender];
       }
       else{
-        require(members[msg.sender].registered); // If user is in company
-        projects[projectName].company_owner = members[msg.sender];
+        require(companies[members[msg.sender]].registered); // If user is in company
+        projects[projectName].company_owner = companies[members[msg.sender]];
       }
       projects[projectName].balance = 0;
       projects[projectName].registered = true;
@@ -223,8 +227,8 @@ contract BuildCollective is Ownable {
       users[msg.sender].balance = users[msg.sender].balance - amount;
     }
     else{
-      require(members[msg.sender].balance >= amount);
-      members[msg.sender].balance = members[msg.sender].balance - amount;
+      require(companies[members[msg.sender]].balance >= amount);
+      companies[members[msg.sender]].balance = companies[members[msg.sender]].balance - amount;
     }
 
     Project memory currentProject = projects[projectName];
@@ -245,7 +249,7 @@ contract BuildCollective is Ownable {
       require(compareString(users[msg.sender].username, projects[projectName].user_owner.username));
     }
     else if (bytes(projects[projectName].company_owner.name).length > 0){
-      require(compareString(members[msg.sender].name, projects[projectName].company_owner.name));
+      require(compareString(members[msg.sender], projects[projectName].company_owner.name));
     }
     else{
       revert("User or his company doesnt own the project");
