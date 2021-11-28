@@ -6,6 +6,7 @@
     </router-link>
     <div class="navbar-items" v-if="store.state.account.address">
       <router-link to="/account" class="navbar-item">Account</router-link>
+      <router-link to="/company" class="navbar-item">Company Profile</router-link>
     </div>
   </nav>
   <router-view />
