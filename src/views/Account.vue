@@ -38,6 +38,9 @@
         </div>
       </card>
     </div>
+      <collective-button @click="goToNewProject" class='btn-primary'>
+        add project
+      </collective-button>
   </div>
 </template>
 
@@ -53,9 +56,9 @@ export default defineComponent({
     const contract = computed(() => store.state.contract) // take the contract  !REQUIRED TO CONNECTION
     const address = computed(() => store.state.account.address) // take the address !REQUIRED TO CONNECTION
     const nbETH = computed(() => store.state.account.nbETH) // take the account balance ex: 100 eth  account.balance != balance
-    return { address, contract, nbETH}
+    return { address, contract, nbETH }
   },
-    data() {
+  data() {
     const account = null
     const username = ''
     return { account, username }
@@ -76,6 +79,9 @@ export default defineComponent({
       const { contract } = this
       await contract.methods.addBalance(200).send()
       await this.updateAccount()
+    },
+    goToNewProject() {
+      this.$router.push({ name: 'Project' }) // Avec cette commande on peut changer de page en utilisant le nom de la page  
     },
   },
   async mounted() {
@@ -158,5 +164,20 @@ export default defineComponent({
   color: white;
   font-family: inherit;
   font-size: 1.3rem;
+}
+
+.btn-primary {
+  margin-top: 20px;
+  background-color: rgb(89, 25, 138);
+  font-size: 16px;
+  padding: 14px 40px;
+  border-radius: 20px;
+  cursor: pointer;
+  text-align: center;
+  /* width: 50%; */
+  margin: auto;
+  margin-top:30px;
+  width: 50%;
+  padding: 10px;
 }
 </style>
