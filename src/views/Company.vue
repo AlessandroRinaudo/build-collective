@@ -98,8 +98,8 @@ export default defineComponent({
     const username = ''
     const company = null
     const companyName = ''
-    const  memberAddress =''
-    return { account, username, company, companyName,memberAddress }
+    const memberAddress = ''
+    return { account, username, company, companyName, memberAddress }
   },
   methods: {
     async updateAccount() {
@@ -130,20 +130,20 @@ export default defineComponent({
       this.companyName = ''
     },
     async addCompanyMember() {
-      const { contract, companyName,memberAddress} = this
+      const { contract, companyName, memberAddress } = this
       const name = companyName.trim().replace(/ /g, '_')
-      console.log("debug",companyName,memberAddress);
-      
-      await contract.methods.addCompanyMember(name,memberAddress).send()
+      console.log('debug', companyName, memberAddress)
+
+      await contract.methods.addCompanyMember(name, memberAddress).send()
       await this.updateCompany()
       this.companyName = ''
     },
   },
   async mounted() {
-    const { address, contract, companyName } = this //you need here of account and address to get "account" objet which contains username, balance( ex : 200 tokens) and a boolean
-    console.log('companyName', companyName)
+    const { address, contract } = this //you need here of account and address to get "account" objet which contains username, balance( ex : 200 tokens) and a boolean
     const account = await contract.methods.user(address).call()
-    const company = await contract.methods.company('CocaCola').call()
+    const companyName = await contract.methods.memberOf(address).call()
+    const company = await contract.methods.company(companyName.name).call()
     if (account.registered) this.account = account
     if (company.registered && company.owner.username === account.username)
       this.company = company
