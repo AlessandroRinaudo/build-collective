@@ -1,3 +1,59 @@
+# implemented functionalities
+
+### front
+- Page to open a user account. Which each user is identified by its wallet address.
+- Page to open an entreprise account.
+- Page to create a project.
+
+### back
+
+- User account, with a name and a balance.
+- Entreprise account, with a name, an owner and some members, possibly with a balance
+
+- projects on which we can give money for sponsoring. 
+Each project has a :
+    - Balance
+    - Name 
+    - List of contributors.
+- Bounties
+
+# The application
+
+To use the app you need to connect :
+
+![](https://codimd.alessandroserver.com/uploads/upload_87cd8ee150627b9efcca02f6d70d2a05.png)
+
+Then you can choise to use your personal account or your company account : 
+
+![](https://codimd.alessandroserver.com//uploads/upload_e4a73c91eb53eeea2bf66a03a813689f.png)
+
+Create an user account if you are not subscribed :
+
+![](https://codimd.alessandroserver.com//uploads/upload_2069d56570c4e37a92d28a715656be98.png)
+
+Create a company account to associate to your account (you will become the owner) : 
+
+![](https://codimd.alessandroserver.com//uploads/upload_1c4f58943ac50756c23215d35ec879b5.png)
+
+Add other members with other user address : 
+
+![](https://codimd.alessandroserver.com//uploads/upload_ca3529467a183048fc2ffd82fd533e9b.png)
+
+Add a Project to your personal account (Your project will be visible to all users of build collective)
+
+![](https://codimd.alessandroserver.com//uploads/upload_cf502b48b50214776e3788ff39cb1771.png)
+
+Choise a name for your project : 
+![](https://codimd.alessandroserver.com//uploads/upload_33f2bd042d081089bd76650f0d008251.png)
+
+You can look projects created by yourself or other community member :
+
+![](https://codimd.alessandroserver.com//uploads/upload_9942f781b11792847c81410c4eb60881.png)
+
+
+
+
+
 # Build Collective
 
 Welcome to the DAAR project. The idea will be to implement an OpenCollective competitor
