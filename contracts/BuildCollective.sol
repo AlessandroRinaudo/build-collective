@@ -22,12 +22,12 @@ contract BuildCollective is Ownable {
     bool registered;
   }
 
-  function compareUsers(User memory a, User memory b) public returns (bool) {
-    return compareString(a.username, b.username)
-    && a.balance == b.balance
-    && a.registered == b.registered
-    ;
-  }
+  // function compareUsers(User memory a, User memory b) public returns (bool) {
+  //   return compareString(a.username, b.username)
+  //   && a.balance == b.balance
+  //   && a.registered == b.registered
+  //   ;
+  // }
 
   mapping(address => User) private users;
 
@@ -82,12 +82,12 @@ contract BuildCollective is Ownable {
     bool registered;
   }
 
-  function compareCompanies(Company memory a, Company memory b) public returns (bool) {
-    return compareString(a.name, b.name)
-    && compareUsers(a.owner, b.owner)
-    && a.balance == b.balance
-    && a.registered == b.registered;
-  }
+  // function compareCompanies(Company memory a, Company memory b) public returns (bool) {
+  //   return compareString(a.name, b.name)
+  //   && compareUsers(a.owner, b.owner)
+  //   && a.balance == b.balance
+  //   && a.registered == b.registered;
+  // }
 
   mapping(string => Company) private companies;
   mapping(address => string) private members;
@@ -157,13 +157,13 @@ contract BuildCollective is Ownable {
   mapping(string => Project) private projects;
   mapping(address => string[]) private contributors;
 
-  function compareProject(Project memory a, Project memory b) public returns (bool) {
-    return compareString(a.name, b.name)
-    && compareUsers(a.user_owner, b.user_owner)
-    && compareCompanies(a.company_owner, b.company_owner)
-    && a.balance == b.balance
-    && a.registered == b.registered;
-  }
+  // function compareProject(Project memory a, Project memory b) public returns (bool) {
+  //   return compareString(a.name, b.name)
+  //   && compareUsers(a.user_owner, b.user_owner)
+  //   && compareCompanies(a.company_owner, b.company_owner)
+  //   && a.balance == b.balance
+  //   && a.registered == b.registered;
+  // }
 
   function getProjectMapping() public view returns (string[] memory){
     return existingProject;
@@ -220,10 +220,11 @@ contract BuildCollective is Ownable {
     require(users[newContributor].registered); // If user aldready registred
     require(projects[projectName].registered); // If project aldready registred
 
-    string[] storage projectContributionList = contributors[newContributor]; // Extract list
-    projectContributionList.push(projectName); //
-    contributors[newContributor] = projectContributionList;
+    // string[] storage projectContributionList = contributors[newContributor]; // Extract list
+    // projectContributionList.push(projectName); //
+    // contributors[newContributor] = projectContributionList;
     // return contributors[newContributor];
+    contributors[newContributor].push(projectName);
   }
 
   function addBalanceToProject(string memory projectName, uint256 amount, bool perso) public returns (bool) {
@@ -267,73 +268,75 @@ contract BuildCollective is Ownable {
     projects[projectName].balance -= amount;
   }
 
+  // Too high gas cost
+
   // ============
   // || Bounty ||
   // ============
 
-  struct Bounty {
-    string name;
-    string desc;
-    uint256 value;
-    User owner;
-    string relatedProject;
-    bool archived;
-    bool registered;
-  }
-
-  mapping(string => Bounty) private bounties;
-  mapping(string => string[]) private relatedTo;
-
-  event BountyCreated(string indexed bountyName, Bounty indexed bou);
-
-
-  function getBounty(string memory bountyName) public view returns (Bounty memory) {
-    return bounties[bountyName];
-  }
-
-  function getBountyRelatedTo(string memory projectName) public view returns (string[] memory) {
-    return relatedTo[projectName];
-  }
-
-  function createBounty(string memory BountyName,string memory desc , uint256 value, string memory relatedProject) public returns (Bounty memory) {
-    require(bytes(BountyName).length > 0);
-    require(bytes(desc).length > 0);
-    require(projects[relatedProject].balance >= value);
-    require(value > 0);
-    require(projects[relatedProject].registered);
-    require(users[msg.sender].registered); // If user aldready registred
-
-    if(!bounties[BountyName].registered){
-      bounties[BountyName].name = BountyName;
-      bounties[BountyName].desc = desc;
-
-      projects[relatedProject].balance -= value;
-      bounties[BountyName].value = value;
-
-      bounties[BountyName].owner = users[msg.sender];
-      bounties[BountyName].relatedProject = relatedProject;
-      relatedTo[relatedProject].push(BountyName);
-
-      bounties[BountyName].archived = false;
-      bounties[BountyName].registered = true;
-    }
-
-    emit BountyCreated(BountyName, bounties[BountyName]);
-
-    return bounties[BountyName];
-  }
-
-  function closeBountyAndPay(string memory bountyName, address receiver) public {
-    require(bytes(bountyName).length > 0);
-    // require(bytes(bounties[bountyName].owner.username) == bytes(users[msg.sender].username));
-    require(compareString(bounties[bountyName].owner.username, users[msg.sender].username));
-    require(users[msg.sender].registered); // If user aldready registred
-    require(users[receiver].registered); // If receiver aldready registred
-    require(!bounties[bountyName].archived); // If receiver aldready registred
-
-    users[receiver].balance += bounties[bountyName].value;
-    bounties[bountyName].archived = true;
-  }
+  // struct Bounty {
+  //   string name;
+  //   string desc;
+  //   uint256 value;
+  //   User owner;
+  //   string relatedProject;
+  //   bool archived;
+  //   bool registered;
+  // }
+  //
+  // mapping(string => Bounty) private bounties;
+  // mapping(string => string[]) private relatedTo;
+  //
+  // event BountyCreated(string indexed bountyName, Bounty indexed bou);
+  //
+  //
+  // function getBounty(string memory bountyName) public view returns (Bounty memory) {
+  //   return bounties[bountyName];
+  // }
+  //
+  // function getBountyRelatedTo(string memory projectName) public view returns (string[] memory) {
+  //   return relatedTo[projectName];
+  // }
+  //
+  // function createBounty(string memory BountyName,string memory desc , uint256 value, string memory relatedProject) public returns (Bounty memory) {
+  //   require(bytes(BountyName).length > 0);
+  //   require(bytes(desc).length > 0);
+  //   require(projects[relatedProject].balance >= value);
+  //   require(value > 0);
+  //   require(projects[relatedProject].registered);
+  //   require(users[msg.sender].registered); // If user aldready registred
+  //
+  //   if(!bounties[BountyName].registered){
+  //     bounties[BountyName].name = BountyName;
+  //     bounties[BountyName].desc = desc;
+  //
+  //     projects[relatedProject].balance -= value;
+  //     bounties[BountyName].value = value;
+  //
+  //     bounties[BountyName].owner = users[msg.sender];
+  //     bounties[BountyName].relatedProject = relatedProject;
+  //     relatedTo[relatedProject].push(BountyName);
+  //
+  //     bounties[BountyName].archived = false;
+  //     bounties[BountyName].registered = true;
+  //   }
+  //
+  //   emit BountyCreated(BountyName, bounties[BountyName]);
+  //
+  //   return bounties[BountyName];
+  // }
+  //
+  // function closeBountyAndPay(string memory bountyName, address receiver) public {
+  //   require(bytes(bountyName).length > 0);
+  //   // require(bytes(bounties[bountyName].owner.username) == bytes(users[msg.sender].username));
+  //   require(compareString(bounties[bountyName].owner.username, users[msg.sender].username));
+  //   require(users[msg.sender].registered); // If user aldready registred
+  //   require(users[receiver].registered); // If receiver aldready registred
+  //   require(!bounties[bountyName].archived); // If receiver aldready registred
+  //
+  //   users[receiver].balance += bounties[bountyName].value;
+  //   bounties[bountyName].archived = true;
+  // }
 
 
 
