@@ -36,11 +36,42 @@
  <div class="card-home-wrapper">
       <card
         :title="company.name"
-        :subtitle="`${nbETH} Ξ\t\t${company.owner.username}`"
+        :subtitle="`Owner : ${company.owner.username}`"
         :gradient="false"
       >
-       
+       <div class="explanations">
+          Company name : {{ company.name}} <br>
+          Company owner : {{ company.owner.username}} <br>
+          balance : {{company.balance}} <br>
+          registered : {{company.registered}} <br> <br>
+          Members : {{ company.members}} <br>
+         
+        </div>
+        <div class="explanations">
+          On your company on the contract, you have
+          {{ company.balance }} tokens. If you click
+          <button class="button-link" @click="addCompanyBalance()">Add tokens</button>
+        </div>
       </card>
+
+      <form @submit.prevent="addCompanyMember">
+        <card
+          title="Enter a new member name"
+        >
+          <input
+            type="text"
+            class="input-username"
+            v-model="companyName"
+            placeholder="Type the company name"
+          />
+          <input
+            type="text"
+            class="input-username"
+            v-model="memberAddress"
+            placeholder="Type a member address"
+          />
+        </card>
+      </form>
     </div>
     </div>
     
@@ -67,7 +98,8 @@ export default defineComponent({
     const username = ''
     const company = null
     const companyName = ''
-    return { account, username, company, companyName }
+    const  memberAddress =''
+    return { account, username, company, companyName,memberAddress }
   },
   methods: {
     async updateAccount() {
@@ -81,10 +113,10 @@ export default defineComponent({
       await this.updateAccount()
       this.username = ''
     },
-    async addTokens() {
+    async addCompanyBalance() {
       const { contract } = this
-      await contract.methods.addBalance(200).send()
-      await this.updateAccount()
+      await contract.methods.addCompanyBalance(200).send()
+      await this.updateCompany()
     },
     async updateCompany() {
       const { address, contract } = this
@@ -97,14 +129,24 @@ export default defineComponent({
       await this.updateCompany()
       this.companyName = ''
     },
+    async addCompanyMember() {
+      const { contract, companyName,memberAddress} = this
+      const name = companyName.trim().replace(/ /g, '_')
+      console.log("debug",companyName,memberAddress);
+      
+      await contract.methods.addCompanyMember(name,memberAddress).send()
+      await this.updateCompany()
+      this.companyName = ''
+    },
   },
   async mounted() {
-    const { address, contract,companyName } = this //you need here of account and address to get "account" objet which contains username, balance( ex : 200 tokens) and a boolean
-    console.log("companyName",companyName);
+    const { address, contract, companyName } = this //you need here of account and address to get "account" objet which contains username, balance( ex : 200 tokens) and a boolean
+    console.log('companyName', companyName)
     const account = await contract.methods.user(address).call()
-    const company = await contract.methods.company("Generalisol").call()
+    const company = await contract.methods.company('CocaCola').call()
     if (account.registered) this.account = account
-    if (company.registered && company.owner.username===account.username) this.company = company
+    if (company.registered && company.owner.username === account.username)
+      this.company = company
   },
 })
 </script>
