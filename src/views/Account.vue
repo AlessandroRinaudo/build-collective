@@ -41,6 +41,15 @@
       <collective-button @click="goToNewProject" class='btn-primary'>
         add project
       </collective-button>
+      <spacer :size="24" />
+      <h2>Liste de projects</h2>
+    <div>
+      <card class ="btn-primary" 
+        v-for="projectList in projectsList" :key="projectList"
+        :title=projectList
+      >
+      </card>
+    </div>
   </div>
 </template>
 
@@ -61,7 +70,10 @@ export default defineComponent({
   data() {
     const account = null
     const username = ''
-    return { account, username }
+    const project = null
+    const projectName = ''
+    const projectsList = ''
+    return { account, username, project, projectName, projectsList }
   },
   methods: {
     async updateAccount() {
@@ -81,13 +93,20 @@ export default defineComponent({
       await this.updateAccount()
     },
     goToNewProject() {
-      this.$router.push({ name: 'Project' }) // Avec cette commande on peut changer de page en utilisant le nom de la page  
+      this.$router.push({ name: 'Project' }) // Avec cette commande on peut changer de page en utilisant le nom de la page
     },
   },
   async mounted() {
-    const { address, contract } = this //you need here of account and address to get "account" objet which contains username, balance( ex : 200 tokens) and a boolean
+    const { address, contract, projectsList } = this //you need here of account and address to get "account" objet which contains username, balance( ex : 200 tokens) and a boolean
     const account = await contract.methods.user(address).call()
     if (account.registered) this.account = account
+    const projectName = await contract.methods.memberOf(address).call()
+    const project = await contract.methods.project(projectName).call()
+    const projetsList = await contract.methods.getProjectMapping().call()
+    this.projectsList = projetsList
+    console.log('Debug', projectsList)
+
+    if (project.registered) this.project = project
   },
 })
 </script>
@@ -176,7 +195,7 @@ export default defineComponent({
   text-align: center;
   /* width: 50%; */
   margin: auto;
-  margin-top:30px;
+  margin-top: 30px;
   width: 50%;
   padding: 10px;
 }
