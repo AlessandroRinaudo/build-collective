@@ -67,7 +67,7 @@
       </form>
     </div>
  </div>
-      <collective-button @click="goToNewProject" class='btn-primary'>
+      <collective-button v-if="company" @click="goToNewProject" class='btn-primary'>
         add project
       </collective-button>
       <spacer :size="24" />
