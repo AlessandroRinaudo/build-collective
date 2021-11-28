@@ -56,14 +56,8 @@
 
       <form @submit.prevent="addCompanyMember">
         <card
-          title="Enter a new member name"
+          title="Enter the new member address"
         >
-          <input
-            type="text"
-            class="input-username"
-            v-model="companyName"
-            placeholder="Type the company name"
-          />
           <input
             type="text"
             class="input-username"
@@ -130,9 +124,10 @@ export default defineComponent({
       this.companyName = ''
     },
     async addCompanyMember() {
-      const { contract, companyName, memberAddress } = this
-      const name = companyName.trim().replace(/ /g, '_')
-      console.log('debug', companyName, memberAddress)
+      const { contract,address,memberAddress } = this
+      const companyName = await contract.methods.memberOf(address).call()
+      const name = companyName.name.trim().replace(/ /g, '_')
+      console.log('debug', name, memberAddress)
 
       await contract.methods.addCompanyMember(name, memberAddress).send()
       await this.updateCompany()
