@@ -29,7 +29,7 @@
           Information depuis Etherium : <br>
           Contract <br>
           Address : {{address}} <br>
-          Nb de ETH : {{nbETH}} 
+          Nb de ETH : {{nbETH}}
         </div>
         <div class="explanations">
           On your account on the contract, you have
@@ -44,7 +44,7 @@
       <spacer :size="24" />
       <h2 v-if ="projectsList.length!==0">Projects List : </h2>
     <div>
-      <card class ="btn-primary" 
+      <card class ="btn-primary"
         v-for="projectList in projectsList" :key="projectList"
         :title=projectList
       >
@@ -93,7 +93,7 @@ export default defineComponent({
       await this.updateAccount()
     },
     goToNewProject() {
-      this.$router.push({ name: 'Project' }) 
+      this.$router.push({ name: 'Project' })
     },
   },
   async mounted() {
