@@ -14,11 +14,6 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/Account.vue'),
   },
   {
-    path: '/company-signin',
-    name: 'CompanySignIn',
-    component: () => import('@/views/CompanySignIn.vue'),
-  },
-  {
     path: '/company',
     name: 'Company',
     component: () => import('@/views/Company.vue'),
@@ -35,12 +30,12 @@ const router = createRouter({
   routes,
 })
 
-// router.beforeEach((to, _from, next) => {
-//   if (to.name !== 'SignIn' && !store.state.account.address) {
-//     next({ name: 'SignIn' })
-//   } else {
-//     next()
-//   }
-// })
+router.beforeEach((to, _from, next) => {
+  if (to.name !== 'SignIn' && !store.state.account.address) {
+    next({ name: 'SignIn' })
+  } else {
+    next()
+  }
+})
 
 export default router

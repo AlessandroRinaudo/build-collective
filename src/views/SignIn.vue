@@ -10,15 +10,13 @@
         Connect
       </collective-button>
     </card>
-    <card v-if=!address> 
-        <collective-button :transparent="true" @click="goToCompanyLogin">
-        or go to company login
-      </collective-button>
-    </card>
     <card title="You're connected!" :blue="true" v-else>
       <collective-button :transparent="true" @click="goToAccount">
         Go to account
       </collective-button>
+       <collective-button :transparent="true" @click="goToCompanyLogin">
+      or go to company login
+      </collective-button> 
     </card>
     <spacer :size="24" />
   </div>
@@ -44,7 +42,7 @@ export default defineComponent({
       this.$router.push({ name: 'Account' }) // Avec cette commande on peut changer de page en utilisant le nom de la page  
     },
     goToCompanyLogin() {
-      this.$router.push({ name: 'CompanySignIn' }) // Avec cette commande on peut changer de page en utilisant le nom de la page  
+      this.$router.push({ name: 'Company' }) // Avec cette commande on peut changer de page en utilisant le nom de la page  
     },
   },
 })
