@@ -113,8 +113,8 @@ export default defineComponent({
       await this.updateCompany()
     },
     async updateCompany() {
-      const { address, contract } = this
-      this.company = await contract.methods.company(address).call()
+      const { companyName, contract } = this
+      this.company = await contract.methods.company(companyName).call()
     },
     async createCompany() {
       const { contract, companyName } = this
