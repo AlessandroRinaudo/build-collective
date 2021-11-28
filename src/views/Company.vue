@@ -53,7 +53,6 @@
           <button class="button-link" @click="addcompanyBalance()">Add tokens</button>
         </div>
       </card>
-
       <form @submit.prevent="addcompanyMember">
         <card
           title="Enter the new member address"
@@ -67,10 +66,20 @@
         </card>
       </form>
     </div>
-    </div>
-
-
+ </div>
+      <collective-button @click="goToNewProject" class='btn-primary'>
+        add project
+      </collective-button>
+      <spacer :size="24" />
+     <h2 v-if ="projectsList.length!==0">Projects List : </h2>
+    <div>
+      <card class ="btn-primary" 
+        v-for="projectList in projectsList" :key="projectList"
+        :title=projectList
+      >
+      </card>
   </div>
+      </div>
 </template>
 
 <script lang="ts">
@@ -93,7 +102,9 @@ export default defineComponent({
     const company = null
     const companyName = ''
     const memberAddress = ''
-    return { account, username, company, companyName, memberAddress }
+    const projectName = ''
+    const projectsList = ''
+    return { account, username, company, companyName, memberAddress,projectName, projectsList  }
   },
   methods: {
     async updateAccount() {
@@ -142,12 +153,19 @@ export default defineComponent({
 
       this.companyName = ''
     },
+    goToNewProject() {
+      this.$router.push({ name: 'Project' }) 
+    },
   },
   async mounted() {
-    const { address, contract } = this //you need here of account and address to get "account" objet which contains username, balance( ex : 200 tokens) and a boolean
+    const { address, contract, projectsList } = this //you need here of account and address to get "account" objet which contains username, balance( ex : 200 tokens) and a boolean
     const account = await contract.methods.user(address).call()
     const companyName = await contract.methods.memberOf(address).call()
     const company = await contract.methods.getCompanie(companyName).call()
+    const projectName = await contract.methods.memberOf(address).call()
+    const project = await contract.methods.project(projectName).call()
+    const projetsList = await contract.methods.getProjectMapping().call()
+    this.projectsList = projetsList
     if (account.registered) this.account = account
     console.log('mounted', companyName, company)
     if (company.registered && company.owner.username === account.username)
@@ -228,5 +246,19 @@ export default defineComponent({
   color: white;
   font-family: inherit;
   font-size: 1.3rem;
+}
+.btn-primary {
+  margin-top: 20px;
+  background-color: rgb(89, 25, 138);
+  font-size: 16px;
+  padding: 14px 40px;
+  border-radius: 20px;
+  cursor: pointer;
+  text-align: center;
+  /* width: 50%; */
+  margin: auto;
+  margin-top: 30px;
+  width: 50%;
+  padding: 10px;
 }
 </style>

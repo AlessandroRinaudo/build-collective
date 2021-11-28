@@ -39,19 +39,8 @@
         :subtitle="`Owner : ${project.user_owner.username}`"
         :gradient="false"
       >
-       <div class="explanations">
-          Project name : {{ project.name}} <br>
-          Project owner : {{ project.user_owner.username}} <br>
-          balance : {{project.balance}} <br>
-          registered : {{project.registered}} <br> <br>
-          Members : {{ project.members}} <br>
-         
-        </div>
-        <div class="explanations">
-          On your project on the contract, you have
-          {{ project.balance }} tokens. If you click
-          <button class="button-link" @click="addProjectBalance()">Add tokens</button>
-        </div>
+       
+        
       </card>
     </div>
     </div>

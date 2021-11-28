@@ -42,7 +42,7 @@
         add project
       </collective-button>
       <spacer :size="24" />
-      <h2>Liste de projects</h2>
+      <h2 v-if ="projectsList.length!==0">Projects List : </h2>
     <div>
       <card class ="btn-primary" 
         v-for="projectList in projectsList" :key="projectList"
@@ -93,7 +93,7 @@ export default defineComponent({
       await this.updateAccount()
     },
     goToNewProject() {
-      this.$router.push({ name: 'Project' }) // Avec cette commande on peut changer de page en utilisant le nom de la page
+      this.$router.push({ name: 'Project' }) 
     },
   },
   async mounted() {
@@ -104,7 +104,6 @@ export default defineComponent({
     const project = await contract.methods.project(projectName).call()
     const projetsList = await contract.methods.getProjectMapping().call()
     this.projectsList = projetsList
-    console.log('Debug', projectsList)
 
     if (project.registered) this.project = project
   },
