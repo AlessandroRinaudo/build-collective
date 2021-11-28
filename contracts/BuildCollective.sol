@@ -152,6 +152,8 @@ contract BuildCollective is Ownable {
     bool registered;
   }
 
+  string[] existingProject;
+
   mapping(string => Project) private projects;
   mapping(address => string[]) private contributors;
 
@@ -161,6 +163,10 @@ contract BuildCollective is Ownable {
     && compareCompanies(a.company_owner, b.company_owner)
     && a.balance == b.balance
     && a.registered == b.registered;
+  }
+
+  function getProjectMapping() public view returns (string[] memory){
+    return existingProject;
   }
 
   function checkIfContributeToProject(address contributor, string memory projectName) public returns (bool) {
@@ -203,6 +209,8 @@ contract BuildCollective is Ownable {
       projects[projectName].registered = true;
     }
     emit ProjectCreated(projectName, projects[projectName]);
+
+    existingProject.push(projectName);
 
     return projects[projectName];
   }
