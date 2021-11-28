@@ -53,19 +53,6 @@
           <button class="button-link" @click="addProjectBalance()">Add tokens</button>
         </div>
       </card>
-
-      <form @submit.prevent="addProjectMember">
-        <card
-          title="Enter the new member address"
-        >
-          <input
-            type="text"
-            class="input-username"
-            v-model="memberAddress"
-            placeholder="Type a member address"
-          />
-        </card>
-      </form>
     </div>
     </div>
     
@@ -138,7 +125,10 @@ export default defineComponent({
     const { address, contract } = this //you need here of account and address to get "account" objet which contains username, balance( ex : 200 tokens) and a boolean
     const account = await contract.methods.user(address).call()
     const projectName = await contract.methods.memberOf(address).call()
-    const project = await contract.methods.project(projectName.name).call()
+    const project = await contract.methods.project(projectName).call()
+    const projetsList = await contract.methods.getProjectMapping().call()
+    console.log("Debuggone", projetsList);
+    
     if (account.registered) this.account = account
     if (project.registered)
       this.project = project
